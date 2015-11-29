@@ -1,0 +1,97 @@
+(function(Counter) {
+	"use strict";
+	
+	Counter.getWordMap = function(text) {
+		let words = text.split(' ');
+		let twoWords = [];
+		let threeWords = [];
+		let map = {};
+
+		// replace the words with the pure form in the words array
+		// populate the twoWords and the threeWords array
+		words.forEach(function(element, index, array) {
+			let pureWord = getPureWord(element).trim();
+			words[index] = pureWord;
+			if (element.length !== 0) {
+				let nextElement = getNextNotEmptyElementOrEmptyString(array, index+1);
+				let nextAfterNextIndex = getNextIndexForElementWhichFollowedByNotEmptyElement(array, index+1);
+				let nextAfterNextElement = "";
+				if (nextAfterNextIndex !== -1) {
+					 nextAfterNextElement = getNextNotEmptyElementOrEmptyString(array, nextAfterNextIndex);
+				}
+				if (index%2 === 0 && !!pureWord.length && !!nextElement.length) {
+					twoWords.push(pureWord + " " + getPureWord(nextElement));
+				}
+				if (index%3 === 0 && !!pureWord.length && !!nextElement.length && !!nextAfterNextElement.length) {
+					threeWords.push(pureWord + " " + getPureWord(nextElement) + " " + getPureWord(nextAfterNextElement));
+				}
+			}
+		});
+
+		console.log("twoWords", twoWords);
+		console.log("threeWords", threeWords);
+
+		words.forEach(function(element, index, array) {
+			if (element.length !== 0) {
+				map = mapTheActualWordtoMap(map, element);
+			}
+		});
+
+		twoWords.forEach(function(element, index, array) {
+			map = mapTheActualWordtoMap(map, element);
+		});
+
+		threeWords.forEach(function(element, index, array) {
+			map = mapTheActualWordtoMap(map, element);
+		});
+
+		console.log("map", sortByValues(map));
+		return map;
+	};
+
+	function mapTheActualWordtoMap(map, element) {
+		if (mapAlreadyContainsTheWord(map, element)) {
+			map[element] = map[element] + 1;
+		} else {
+			map[element] = 1;
+		}
+		return map;
+	}
+
+	function mapAlreadyContainsTheWord(map, element) {
+		return element in map;
+	}
+
+	function getPureWord(word) {
+		return word.replace(/[^a-zA-Z0-9]/gi,'');
+	}
+
+	function sortByValues(map) {
+		return Object.keys(map).sort(
+			function(a,b) {
+				return map[a]-map[b]
+			});
+	}
+
+	function getNextNotEmptyElementOrEmptyString(array, index) {
+		for ( ; index < array.length ; index++ ) {
+			if (array[index].length !== 0) {
+				return array[index];
+			}
+		}
+		return "";
+	}
+
+	function getNextIndexForElementWhichFollowedByNotEmptyElement(array, index) {
+		let firstAlreadyFound = false;
+		for ( ; index < array.length ; index++ ) {
+			if (array[index].length !== 0 && firstAlreadyFound) {
+				return index;
+			} else {
+				firstAlreadyFound = true;
+			}
+		}
+		return -1;
+	}
+
+})(window.Counter = window.Counter || {});
