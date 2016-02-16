@@ -4,5 +4,6 @@
 var a = 10;
 var b = 99;
 a^=b, b^=a, a^=b;
+// a = b + a; b = a - b; a = a - b;
 console.log('a', a);
 console.log('b', b);
